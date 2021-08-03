@@ -66,13 +66,26 @@ void loop() {
       // On actualise la position de la zone du tableau à afficher
       Position_camera(Joueur.X, Joueur.Y);
 
-      // On compte les caisses bien positionnées
-      // count_Boxes_On_Good_Place();
-
       // On affiche le contenu de chacune des cases
       DessineNiveau();
       DessinePerso();
+
+      // On compte les caisses bien positionnées
+      count_Boxes_On_Good_Place();
+
+      if (PlacedBoxes == Boxes) game.state = State::endlevel;
       break;
+
+      case State::endlevel:
+      if (game.NIVEAU_COURRANT < NB_NIVEAUX) {
+        ++game.NIVEAU_COURRANT;
+        PlacedBoxes = 0;
+        init_level();
+        game.state = State::running;
+      } else {
+        game.state = State::gameover;
+      }
+      break;      
   }
 
 }

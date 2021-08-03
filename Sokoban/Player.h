@@ -7,7 +7,7 @@
 #define GAUCHE 3
 #define DROITE 4
 
-#define VITESSE_ANIME 3
+#define VITESSE_ANIME 2   // Low to go quickest - High to go slowly
 
 struct Type_Joueur {
   int X; // Position horizontale du personnage
