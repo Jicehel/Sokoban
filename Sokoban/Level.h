@@ -1,11 +1,37 @@
 #ifndef LEVEL_H
 #define LEVEL_H
 
+extern void count_Boxes();
+extern void count_Boxes_On_Good_Place();
+
 char NB_LIGNES_NIVEAUX;
 char NB_COLONNES_NIVEAUX;
 char * currentLevelData;
+char Boxes;
+char PlacedBoxes;
 
 char NB_NIVEAUX = 2;
+
+// # : Wall
+// $ : box
+// . : box destination place
+// * : caisse on a destination place
+//space (' ') : empty place (ground)
+
+char brainsport[] = 
+{
+   10,10,
+   ' ','#','#','#','#','#','#','#','#','#',
+   ' ','#','@','#','#','#','#',' ',' ','#',
+   ' ','#','$','#',' ',' ',' ',' ',' ','#',
+   ' ','#',' ','#',' ',' ','#','#',' ','#',
+   ' ','#',' ','#','#',' ','#','#',' ','#',
+   '#','#',' ','#','#',' ','#','#',' ','#',
+   '#',' ',' ','#','#',' ','#','#',' ','#',
+   '#',' ',' ',' ',' ',' ','#','#',' ','#',
+   '#','#','#','#',' ',' ','#','#','.','#',
+   ' ',' ',' ','#','#','#','#','#','#','#',
+};
 
 char niveau1[] =
 {
@@ -25,7 +51,6 @@ char niveau1[] =
 
 char niveau2[] =
 {
-  
  8, 8,
  '#','#','#','#','#',' ',' ',' ',
  '#',' ',' ','@','#','#','#','#',
@@ -38,7 +63,7 @@ char niveau2[] =
 };
 
 char* levels[] = {
-    niveau1, niveau2,
+    brainsport, niveau1, niveau2,
 };
 
 #endif

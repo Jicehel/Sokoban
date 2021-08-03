@@ -70,6 +70,7 @@ void Position_camera(uint8_t Xp, uint8_t  Yp) {
   if (Xp > NB_COLONNES_NIVEAUX - 3) {
     Camera.X = NB_COLONNES_NIVEAUX - 5;
   }
+  
 
   if (Yp > NB_LIGNES_NIVEAUX - 3) {
     Camera.Y = NB_LIGNES_NIVEAUX - 5;
@@ -79,7 +80,11 @@ void Position_camera(uint8_t Xp, uint8_t  Yp) {
 void DessineNiveau() {
   for (int ligne = 0 ; ligne < 7; ligne++) {
     for (int colonne = 0; colonne < 7; colonne++) {
-      DessineSprite(currentLevelData[(Camera.Y + ligne)*NB_COLONNES_NIVEAUX + Camera.X + colonne], colonne , ligne);
+      if ((Camera.Y + ligne) < NB_LIGNES_NIVEAUX) {
+        if ((Camera.X + colonne) < NB_COLONNES_NIVEAUX) {
+          DessineSprite(currentLevelData[(Camera.Y + ligne)*NB_COLONNES_NIVEAUX + Camera.X + colonne], colonne , ligne);
+        }
+      }    
     }
   }
 }

@@ -1,22 +1,37 @@
-// Sokoban (partie 3)
+// Sokoban (partie 4)
 // Donnons vie à notre gardien d'entrepot
 // Au programme: 
 //           - ajout du joueur
 //           - gestion des mouvements
 //           - gestion des caisses mobiles
+//           - gestion des niveaux
 //
+// Source des niveaux: http://www.sourcecode.se/sokoban/levels
+//
+
 
 #include <Gamebuino-Meta.h>
 #include "Level.h"
 #include "Player.h"
 #include "Graphics.h"
 
-char NIVEAU_COURRANT;
+enum class State : uint8_t {
+  initialize,
+  running,
+  endlevel,
+  gameover
+};
+
+struct Game {
+  State state;
+  uint8_t NIVEAU_COURRANT;
+};
+
+Game game;
 
 void setup() {
   gb.begin();
-  NIVEAU_COURRANT = 1;
-  init_level();
+  game.state = State::initialize;
 }
 
 void init_level() {
@@ -25,23 +40,39 @@ void init_level() {
   Joueur.Direction = BAS;
   Joueur.Anime = 0;
   Joueur.Pousse  = 0;
-    currentLevelData = levels[NIVEAU_COURRANT] + 2;
-  NB_LIGNES_NIVEAUX = levels[NIVEAU_COURRANT][1];
-  NB_COLONNES_NIVEAUX = levels[NIVEAU_COURRANT][0];
+  currentLevelData = levels[game.NIVEAU_COURRANT] + 2;
+  NB_LIGNES_NIVEAUX = levels[game.NIVEAU_COURRANT][1];
+  NB_COLONNES_NIVEAUX = levels[game.NIVEAU_COURRANT][0];
+  count_Boxes();
   trouve_position_perso();
+  game.state = State::running;
 }
 
 void loop() {
-  while (!gb.update());
+  gb.waitForUpdate();
   gb.display.clear();
 
-  // On actualise l'état du joueur
-  MAJ_Joueur();
+  switch (game.state) {
 
-  // On actualise la position de la zone du tableau à afficher
-  Position_camera(Joueur.X, Joueur.Y);
+    case State::initialize:
+      game.NIVEAU_COURRANT = 0;
+      init_level();
+      break;
 
-  // On affiche le contenu de chacune des cases
-  DessineNiveau();
-  DessinePerso();
+    case State::running:
+      // On actualise l'état du joueur
+      MAJ_Joueur();
+
+      // On actualise la position de la zone du tableau à afficher
+      Position_camera(Joueur.X, Joueur.Y);
+
+      // On compte les caisses bien positionnées
+      // count_Boxes_On_Good_Place();
+
+      // On affiche le contenu de chacune des cases
+      DessineNiveau();
+      DessinePerso();
+      break;
+  }
+
 }

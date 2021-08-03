@@ -2,6 +2,7 @@
 Type_Joueur Joueur;
 Type_Caisse BougeCaisse;
 
+
 // Procédure de recherche de la position initiale du joueur (le @ dans le tableau)
 void trouve_position_perso() {
   for (int ligne = 0; ligne < NB_LIGNES_NIVEAUX; ligne++) {
@@ -9,9 +10,6 @@ void trouve_position_perso() {
       if (currentLevelData[ligne * NB_COLONNES_NIVEAUX + colonne] == '@') {
         Joueur.X = colonne;
         Joueur.Y = ligne;
-        gb.display.printf(1, 1, "%03u", Joueur.X);
-        gb.display.printf(1, 2, "%03u", Joueur.Y);
-        delay(3000);
       }
     }
   }
