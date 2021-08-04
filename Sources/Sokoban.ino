@@ -64,7 +64,7 @@ float decalageV;
 
 struct Game {
   State state;
-  uint8_t NIVEAU_COURRANT;
+  uint32_t NIVEAU_COURRANT;
 };
 
 Game game;
@@ -72,6 +72,8 @@ Game game;
 void setup() {
   gb.begin();
   game.state = State::initialize;
+  // Activate line bellow to remove old progresson
+  // gb.save.del(0);
 }
 
 void init_level() {
@@ -101,7 +103,8 @@ void loop() {
   switch (game.state) {
 
     case State::initialize:
-      game.NIVEAU_COURRANT = 0;
+      // game.NIVEAU_COURRANT = 0;
+      game.NIVEAU_COURRANT = gb.save.get(0);
       init_level();
       break;
 
@@ -186,7 +189,11 @@ void loop() {
         soundtoplay = SoundToPlay::EndLevel;
         playSound();
         PlacedBoxes = 0;
+        gb.display.setColor(WHITE);
+        gb.display.printf(8, 0, "Launch level %03u", game.NIVEAU_COURRANT + 1);
+        delay(2000);
         init_level();
+        gb.save.set(0, game.NIVEAU_COURRANT);
         game.state = State::running;
       } else {
         game.state = State::gameover;
