@@ -46,10 +46,10 @@ void playSound() {
       // gb.sound.playOK();
       break;
     case SoundToPlay::EndLevel:
-      gb.sound.play("Sound\EndLevel.wav");
+      gb.sound.play("Sound/EndLevel.wav");
       break;
     case SoundToPlay::EndGame:
-      gb.sound.play("Sound\Gameover.wav");
+      gb.sound.play("Sound/Gameover.wav");
       break;  
     case SoundToPlay::Nothing: 
     default:
