@@ -15,9 +15,12 @@
 #include "Level.h"
 #include "Player.h"
 #include "Graphics.h"
+#include "Help.h"
 
 enum class State : uint8_t {
   initialize,
+  startmenu,
+  help,
   running,
   endlevel,
   map,
@@ -33,6 +36,18 @@ enum class SoundToPlay : uint8_t {
   Nothing,
   EndGame
 };
+
+float decalageH;
+float decalageV;
+
+struct Game {
+  State state;
+  uint32_t NIVEAU_COURRANT;
+  uint8_t HELP_PAGE;
+};
+
+Game game;
+
 
 SoundToPlay soundtoplay;
 
@@ -59,16 +74,6 @@ void playSound() {
   soundtoplay = SoundToPlay::Nothing;
 }
 
-float decalageH;
-float decalageV;
-
-struct Game {
-  State state;
-  uint32_t NIVEAU_COURRANT;
-};
-
-Game game;
-
 void setup() {
   gb.begin();
   game.state = State::initialize;
@@ -92,8 +97,7 @@ void init_level() {
   }
   count_Boxes();
   trouve_position_perso();
-  game.state = State::running;
-  
+  game.state = State::running; 
 }
 
 void loop() {
@@ -102,20 +106,45 @@ void loop() {
 
   switch (game.state) {
 
+
     case State::initialize:
-      // game.NIVEAU_COURRANT = 0;
-      game.NIVEAU_COURRANT = gb.save.get(0);
-      init_level();
+      game.NIVEAU_COURRANT = 0;
+      // game.NIVEAU_COURRANT = gb.save.get(0);
+      game.state = State::startmenu;
       break;
 
-    case State::reinit:
 
+//startmenu -> running / help
+
+    case State::startmenu:
+      gb.display.drawImage(0, 0, Title);
+      gb.display.setColor(WHITE);
+      // gb.display.setCursor(10, 5);
+      // gb.display.print("Sokoban");
+      gb.display.setCursor(0, 35);
+      gb.display.print("<A> Launch gamne");
+      gb.display.setCursor(0, 50);
+      gb.display.print("<B> Read help");
+
+      if (gb.buttons.pressed(BUTTON_A)) {
+          init_level();
+      }
+      if (gb.buttons.pressed(BUTTON_B)) {
+        game.state = State::help;
+        game.HELP_PAGE = 1;
+      }
+      break;
+
+
+// reinit => running
+
+    case State::reinit:
       gb.display.setColor(WHITE);
       gb.display.setCursor(0, 5);
       gb.display.print("Restart level ?");
-      gb.display.setCursor(0, 35);
+      gb.display.setCursor(0, 25);
       gb.display.print("<A> Yes, restart");
-      gb.display.setCursor(0, 50);
+      gb.display.setCursor(0, 40);
       gb.display.print("<B> Return to game");
 
       if (gb.buttons.pressed(BUTTON_A)) {
@@ -128,6 +157,26 @@ void loop() {
       }
       if (gb.buttons.pressed(BUTTON_B)) game.state = State::running;
       break;
+
+
+// help -> help / running
+
+    case State::help:
+      switch (game.HELP_PAGE) {
+        case 1:
+          Help_screen1();
+          break;
+        case 2:
+          Help_screen2();
+          break;
+        case 3:
+          Help_screen3();
+          break;          
+      }
+    break;
+
+
+// map -> DisplayLegend / Running
 
     case State::map:
       decalageH = (20 - NB_COLONNES_NIVEAUX)*2;
@@ -159,10 +208,22 @@ void loop() {
       }
       gb.display.setColor(WHITE);
       gb.display.printf(8, 0, "Map of level %03u", game.NIVEAU_COURRANT + 1);
+      gb.display.printf(0, 54, "<A> Legend  <B> Game");
+      // add here button_A to display map legend (DisplayLegend)
       if (gb.buttons.pressed(BUTTON_B)) game.state = State::running;
       break;
 
+
+// running -> map / endlevel / reinit
+
     case State::running:
+
+      gb.display.setColor(WHITE);
+      gb.display.printf(0, 56, "<A> Map  <B> Restart");
+      gb.display.setColor(GRAY);
+      gb.display.printf(60, 0, "LEVEL");
+      gb.display.setColor(WHITE);
+      gb.display.printf(64, 10, "%03u", game.NIVEAU_COURRANT + 1);
       // On actualise l'état du joueur
       MAJ_Joueur();
 
@@ -178,10 +239,12 @@ void loop() {
       count_Boxes_On_Good_Place();
 
       if (PlacedBoxes == Boxes) game.state = State::endlevel;
-
       if (gb.buttons.pressed(BUTTON_A)) game.state = State::map;
       if (gb.buttons.pressed(BUTTON_B)) game.state = State::reinit;
       break;
+
+
+// endlevel -> running / gameover
 
       case State::endlevel:
       if (game.NIVEAU_COURRANT < NB_NIVEAUX) {
