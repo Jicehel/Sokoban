@@ -24,6 +24,7 @@ enum class State : uint8_t {
   running,
   endlevel,
   map,
+  displaylegend,
   reinit,
   gameover
 };
@@ -176,7 +177,7 @@ void loop() {
     break;
 
 
-// map -> DisplayLegend / Running
+// map -> displaylegend / running
 
     case State::map:
       decalageH = (20 - NB_COLONNES_NIVEAUX)*2;
@@ -209,9 +210,40 @@ void loop() {
       gb.display.setColor(WHITE);
       gb.display.printf(8, 0, "Map of level %03u", game.NIVEAU_COURRANT + 1);
       gb.display.printf(0, 54, "<A> Legend  <B> Game");
-      // add here button_A to display map legend (DisplayLegend)
+      if (gb.buttons.pressed(BUTTON_A)) game.state = State::displaylegend;
       if (gb.buttons.pressed(BUTTON_B)) game.state = State::running;
       break;
+
+// displaylegend -> map
+      case State::displaylegend: 
+        gb.display.setColor(WHITE);
+        gb.display.drawRect(5, 1, 4, 4);
+        gb.display.setColor(WHITE);
+        gb.display.printf(12, 0, "Empty space");
+        gb.display.setColor(RED);
+        gb.display.fillRect(5, 9, 4, 4);
+        gb.display.setColor(WHITE);
+        gb.display.printf(12, 8, "Wall");
+        gb.display.setColor(YELLOW);
+        gb.display.fillRect(5, 18, 4, 4);
+        gb.display.setColor(WHITE);
+        gb.display.printf(12, 16, "Case");
+        gb.display.setColor(GREEN);
+        gb.display.fillRect(5, 26, 4, 4);
+        gb.display.setColor(WHITE);
+        gb.display.printf(12, 24, "Case on mark");
+        gb.display.setColor(WHITE);
+        gb.display.fillRect(5, 34, 4, 4);
+        gb.display.setColor(WHITE);
+        gb.display.printf(12, 32, "Player");
+        gb.display.setColor(BLUE);
+        gb.display.fillRect(5, 42, 4, 4);
+        gb.display.setColor(WHITE);
+        gb.display.printf(12, 40, "Empty mark");        
+        gb.display.setColor(WHITE);
+        gb.display.printf(0, 54, "<B> Return to map");
+        if (gb.buttons.pressed(BUTTON_B)) game.state = State::map;
+        break;
 
 
 // running -> map / endlevel / reinit
