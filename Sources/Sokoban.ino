@@ -40,6 +40,7 @@ enum class SoundToPlay : uint8_t {
 
 float decalageH;
 float decalageV;
+char pas;
 
 struct Game {
   State state;
@@ -96,6 +97,11 @@ void init_level() {
       saveLevel[ligne * NB_COLONNES_NIVEAUX + colonne] = currentLevelData[ligne * NB_COLONNES_NIVEAUX + colonne];
     }
   }
+  if ((NB_LIGNES_NIVEAUX > 16) || (NB_COLONNES_NIVEAUX > 20)) {
+    pas = 3;
+  } else if ((NB_LIGNES_NIVEAUX < 12) && (NB_COLONNES_NIVEAUX < 16)) {
+      pas = 5;
+  } else pas = 4;
   count_Boxes();
   trouve_position_perso();
   game.state = State::running; 
@@ -180,9 +186,17 @@ void loop() {
 // map -> displaylegend / running
 
     case State::map:
-      decalageH = (20 - NB_COLONNES_NIVEAUX)*2;
-      decalageV = (16 - NB_LIGNES_NIVEAUX)*2;
-      
+      if (pas == 4) {
+        decalageH = (20 - NB_COLONNES_NIVEAUX)*2;
+        decalageV = (16 - NB_LIGNES_NIVEAUX)*2;
+      } else if (pas == 3) {
+          decalageH = (26 - NB_COLONNES_NIVEAUX)*1.5;
+          decalageV = (20 - NB_LIGNES_NIVEAUX)*1.5;
+      } else if (pas == 5) {
+          decalageH = (16 - NB_COLONNES_NIVEAUX)*2.5;
+          decalageV = (12 - NB_LIGNES_NIVEAUX)*2.5;        
+      }
+      // gb.display.printf(0, 0, "%01u", pas);
       for (int ligne = 0; ligne < NB_LIGNES_NIVEAUX; ligne++) {
         for (int colonne = 0; colonne < NB_COLONNES_NIVEAUX; colonne++) {
             switch (currentLevelData[(ligne)*NB_COLONNES_NIVEAUX + colonne ]) {
@@ -200,11 +214,18 @@ void loop() {
               break;
               case '@':
                   gb.display.setColor(WHITE);
-              break;              
+              break;
+              case '+':    
+                  gb.display.setColor(BLUE);   
+              break;    
               case '.':
                   gb.display.setColor(BLUE);
             } 
-            gb.display.fillRect(decalageH + colonne * 4, decalageV + ligne * 4, 4, 4);
+            gb.display.fillRect(decalageH + colonne * pas, decalageV + ligne * pas, pas, pas);
+            if(currentLevelData[(ligne)*NB_COLONNES_NIVEAUX + colonne ]== '+') {
+              gb.display.setColor(WHITE);
+              gb.display.fillTriangle( decalageH + colonne * pas, decalageV + ligne * pas,decalageH + colonne * pas, decalageV + (ligne+1) * pas - 2,decalageH + (colonne + 1) * pas - 1, decalageV + ligne * pas);
+            }
         }
       }
       gb.display.setColor(WHITE);
